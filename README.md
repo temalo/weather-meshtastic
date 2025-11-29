@@ -49,6 +49,32 @@ Each script requires configuration variables at the top of the file:
 - `TEMPEST_STATION_ID` / `TEMPEST_API_TOKEN` - For Tempest scripts
 - `USER_AGENT` - Your contact info for NWS API requests
 
+## Tempest API Setup
+
+The Tempest scripts (`getwx.py` and `tempest_forecast.py`) require a Tempest Weather Station and API token.
+
+### Getting Your Station ID
+
+Your Station ID can be found in your Tempest account at [tempestwx.com](https://tempestwx.com):
+1. Log in to your Tempest account
+2. Click on your station name in the left sidebar
+3. Click the gear icon (⚙️) or "Settings" for your station
+4. Your Station ID will be displayed in the station information section
+
+### Generating a Tempest API Token
+
+To generate an API token:
+1. Go to [tempestwx.com/settings/tokens](https://tempestwx.com/settings/tokens)
+2. Log in with your Tempest account credentials
+3. Click "Create Token"
+4. Give your token a descriptive name (e.g., "Meshtastic Weather")
+5. Copy the generated token and add it to your script's `TEMPEST_API_TOKEN` variable
+
+### Tempest API Documentation
+
+For more information about the Tempest/WeatherFlow API, refer to the official documentation:
+- [WeatherFlow Tempest API Documentation](https://weatherflow.github.io/Tempest/api/)
+
 ## Requirements
 
 ```
