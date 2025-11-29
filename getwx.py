@@ -7,8 +7,8 @@ from datetime import datetime
 # Replace with your personal API token
 API_TOKEN = "YOUR_API_TOKEN"
 STATION_ID = "YOUR_STATION_ID"  # You can find this in your Tempest account
-CHANNEL_INDEX = "4"
-MESHTASTIC_HOST = "192.168.111.153"  # Change to your Meshtastic device IP/hostname
+CHANNEL_INDEX = "4" # The Meshtastic channel index to use
+MESHTASTIC_HOST = "Your NODE address"  # Change to your Meshtastic device IP/hostname
 PANEL_SIZE = .04 #Panel size in square meters. Adjust based on your solar panel size.
 PANEL_EFFICIENCY = 0.20 #Assumed panel efficiency (20%)
 
