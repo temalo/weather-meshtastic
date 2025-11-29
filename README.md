@@ -21,6 +21,7 @@ Fetches current weather conditions from your Tempest Weather Station and sends v
 - Temperature, humidity, pressure, wind data
 - Rainfall and lightning strike counts
 - Solar radiation index
+- Estimated charge rate for solar panel based on configured panel size in square meters
 
 ### nws_current_weather.py
 Fetches current weather observations from the nearest NWS weather station and sends via Meshtastic.
