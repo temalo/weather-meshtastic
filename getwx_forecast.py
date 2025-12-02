@@ -59,7 +59,7 @@ def main():
         if forecast_count >= 2:
             break
     
-    forecast_text = "\n".join(forecast_lines)
+    forecast_text = "\r\n".join(forecast_lines)
 
     # 4) Useful extras: active alerts for the area
     alerts_url = f"https://api.weather.gov/alerts/active?point={LAT},{LON}"
@@ -70,7 +70,7 @@ def main():
         for a in features:
             info = a["properties"]
             alerts_lines.append(f"- {info.get('event')}: {info.get('headline')}")
-        alerts_message = "\n".join(alerts_lines)
+        alerts_message = "\r\n".join(alerts_lines)
     else:
         alerts_message = "No active alerts."
     
