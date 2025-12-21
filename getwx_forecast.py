@@ -63,38 +63,87 @@ def main():
         if forecast_count >= 2:
             break
     
-    forecast_text = "\r\n".join(forecast_lines)
-
-    # 4) Useful extras: active alerts for the area
+    # 4) Check for active alerts for the area
     alerts_url = f"https://api.weather.gov/alerts/active?point={LAT},{LON}"
     alerts = get_json(alerts_url)
     features = alerts.get("features", [])
-    if features:
+    
+    # If no alerts, add it to forecast message; if alerts exist, keep as separate message
+    if not features:
+        # No alerts - add to forecast message
+        forecast_lines.append("No active alerts.")
+        forecast_text = "\r\n".join(forecast_lines)
+        alerts_message = None
+    else:
+        # Active alerts - keep as separate message
+        forecast_text = "\r\n".join(forecast_lines)
         alerts_lines = ["Active alerts:"]
         for a in features:
             info = a["properties"]
             alerts_lines.append(f"- {info.get('event')}: {info.get('headline')}")
         alerts_message = "\r\n".join(alerts_lines)
-    else:
-        alerts_message = "No active alerts."
     
-    # Send both messages using Meshtastic API
+    # Helper function to split message into 210-char chunks
+    def split_message(msg):
+        messages = []
+        if len(msg) > 210:
+            # First message: 207 chars + "..."
+            messages.append(msg[:207] + "...")
+            remaining = msg[207:]
+            
+            # Additional messages for remainder
+            while remaining:
+                if len(remaining) > 210:
+                    messages.append(remaining[:210])
+                    remaining = remaining[210:]
+                else:
+                    messages.append(remaining)
+                    remaining = ""
+        else:
+            messages.append(msg)
+        return messages
+    
+    # Split forecast message if needed
+    forecast_messages = split_message(forecast_text)
+    
+    if len(forecast_messages) > 1:
+        print(f"Warning: Forecast split into {len(forecast_messages)} parts (original: {len(forecast_text)} chars)")
+    
+    # Split alerts message if it exists
+    alerts_messages = []
+    if alerts_message:
+        alerts_messages = split_message(alerts_message)
+        if len(alerts_messages) > 1:
+            print(f"Warning: Alerts split into {len(alerts_messages)} parts (original: {len(alerts_message)} chars)")
+    
+    # Send message(s) using Meshtastic API
     try:
         interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
         
-        # Send forecast message
-        print(f"Sending forecast message ({len(forecast_text)} chars)...")
-        interface.sendText(forecast_text, channelIndex=int(CHANNEL_INDEX))
-        print("Forecast message sent successfully!")
+        # Send forecast message(s)
+        for idx, msg in enumerate(forecast_messages, 1):
+            print(f"Sending forecast message part {idx}/{len(forecast_messages)} ({len(msg)} chars)...")
+            interface.sendText(msg, channelIndex=int(CHANNEL_INDEX))
+            print(f"Forecast part {idx} sent successfully!")
+            
+            if idx < len(forecast_messages):
+                print("Waiting 3 seconds before sending next part...")
+                time.sleep(3)
         
-        # Wait a few seconds for the first message to be queued/transmitted
-        print("Waiting 5 seconds before sending alerts message...")
-        time.sleep(5)
-        
-        # Send alerts message
-        print(f"Sending alerts message ({len(alerts_message)} chars): {alerts_message}")
-        interface.sendText(alerts_message, channelIndex=int(CHANNEL_INDEX))
-        print("Alerts message sent successfully!")
+        # Send alerts message(s) only if there are alerts
+        if alerts_messages:
+            # Wait between forecast and alerts
+            print("Waiting 5 seconds before sending alerts message...")
+            time.sleep(5)
+            
+            for idx, msg in enumerate(alerts_messages, 1):
+                print(f"Sending alerts message part {idx}/{len(alerts_messages)} ({len(msg)} chars): {msg}")
+                interface.sendText(msg, channelIndex=int(CHANNEL_INDEX))
+                print(f"Alerts part {idx} sent successfully!")
+                
+                if idx < len(alerts_messages):
+                    print("Waiting 3 seconds before sending next part...")
+                    time.sleep(3)
         
         # Wait a moment before closing to ensure message is queued
         time.sleep(2)

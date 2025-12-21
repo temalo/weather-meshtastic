@@ -119,14 +119,41 @@ def main():
     print(message)
     print("="*50)
     
-    # Send message using Meshtastic API
+    # Enforce 210 character limit for Meshtastic - split into multiple messages if needed
+    messages_to_send = []
+    if len(message) > 210:
+        # First message: 207 chars + "..."
+        messages_to_send.append(message[:207] + "...")
+        remaining = message[207:]
+        
+        # Additional messages for remainder
+        while remaining:
+            if len(remaining) > 210:
+                messages_to_send.append(remaining[:210])
+                remaining = remaining[210:]
+            else:
+                messages_to_send.append(remaining)
+                remaining = ""
+        
+        print(f"Warning: Message split into {len(messages_to_send)} parts (original: {len(message)} chars)")
+    else:
+        messages_to_send.append(message)
+    
+    # Send message(s) using Meshtastic API
     try:
         interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
-        print(f"\nSending weather message ({len(message)} chars)...")
-        interface.sendText(message, channelIndex=int(CHANNEL_INDEX))
-        print("Message sent successfully!")
         
-        # Wait to ensure message is queued before closing
+        for idx, msg in enumerate(messages_to_send, 1):
+            print(f"\nSending weather message part {idx}/{len(messages_to_send)} ({len(msg)} chars)...")
+            interface.sendText(msg, channelIndex=int(CHANNEL_INDEX))
+            print(f"Part {idx} sent successfully!")
+            
+            # Wait between messages if there are multiple parts
+            if idx < len(messages_to_send):
+                print("Waiting 3 seconds before sending next part...")
+                time.sleep(3)
+        
+        # Wait to ensure final message is queued before closing
         time.sleep(2)
         interface.close()
         print("Connection closed.")
