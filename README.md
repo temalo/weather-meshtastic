@@ -10,6 +10,7 @@ This project provides professional weather monitoring scripts with centralized c
 - **Multiple weather data sources**: NWS and Tempest Weather Station support
 - **Meshtastic integration**: Seamless transmission to your mesh network
 - **Current conditions and forecasts**: Real-time observations and future predictions
+- **Automatic message splitting**: Messages longer than 210 characters are automatically split into multiple parts with appropriate delays between transmissions
 
 ## Scripts
 
@@ -22,6 +23,8 @@ Fetches NWS (National Weather Service) hourly forecast data and sends the next 2
 - Sends next 2 upcoming hours of weather data
 - Includes active weather alerts
 
+**Note:** Messages include a hardcoded location reference ("NE Scottsdale"). You may want to modify line 45 in the script to reflect your actual location.
+
 ### getwx.py
 Fetches current weather conditions from your Tempest Weather Station and sends via Meshtastic.
 
@@ -31,6 +34,8 @@ Fetches current weather conditions from your Tempest Weather Station and sends v
 - Rainfall and lightning strike counts
 - Solar radiation index
 - Estimated charge rate for solar panel based on configured panel size in square meters
+
+**Note:** Messages include a hardcoded location reference ("NE Scottsdale"). You may want to modify line 59 in the script to reflect your actual location.
 
 ### nws_current_weather.py
 Fetches current weather observations from the nearest NWS weather station and sends via Meshtastic.
@@ -48,6 +53,8 @@ Fetches daily forecast from Tempest Weather Station Better Forecast API and send
 - Precipitation probability
 - Wind forecast
 - Sunrise/sunset times
+
+**Note:** Messages include a hardcoded location reference ("NE Scottsdale"). You may want to modify line 96 in the script to reflect your actual location. Also note that this script uses a default `CHANNEL_INDEX` of `0` instead of `4`.
 
 ## Configuration
 
@@ -73,7 +80,7 @@ Edit your `.env` file with the following variables:
 
 #### Required for All Scripts
 - `MESHTASTIC_HOST` - IP address or hostname of your Meshtastic device (default: `localhost`)
-- `CHANNEL_INDEX` - Meshtastic channel index to send messages to (default: `4`)
+- `CHANNEL_INDEX` - Meshtastic channel index to send messages to (default: `4` for most scripts, `0` for `tempest_forecast.py`)
 
 #### Required for NWS Scripts (getwx_forecast.py, nws_current_weather.py)
 - `LAT` - Your location latitude (e.g., `33.74733`)
@@ -139,6 +146,9 @@ For more information about the Tempest/WeatherFlow API, refer to the official do
 
 ## Requirements
 
+**Python Version:** Python 3.7 or higher is required.
+
+**Dependencies:**
 ```
 requests>=2.31.0
 meshtastic>=2.2.0
@@ -163,6 +173,16 @@ python tempest_forecast.py
 ```
 
 **Note**: Each script will validate that required environment variables are set before running.
+
+### Customizing Location References
+
+Some scripts include hardcoded location references in their output messages (e.g., "NE Scottsdale"). To customize these for your location:
+
+- **getwx.py**: Edit line 59 to change the location name in the weather message
+- **getwx_forecast.py**: Edit line 45 to change the location name in the forecast message
+- **tempest_forecast.py**: Edit line 96 to change the location name in the forecast message
+
+The `nws_current_weather.py` script automatically uses the station name from the NWS API and does not require customization.
 
 ## Security Best Practices
 
