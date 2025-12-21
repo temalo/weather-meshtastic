@@ -2,15 +2,24 @@ import requests
 import meshtastic
 import meshtastic.tcp_interface
 import time
+import os
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Replace with your personal API token
-API_TOKEN = "YOUR_API_TOKEN"
-STATION_ID = "YOUR_STATION_ID"  # You can find this in your Tempest account
-CHANNEL_INDEX = "4" # The Meshtastic channel index to use
-MESHTASTIC_HOST = "Your NODE address"  # Change to your Meshtastic device IP/hostname
-PANEL_SIZE = .04 #Panel size in square meters. Adjust based on your solar panel size.
-PANEL_EFFICIENCY = 0.20 #Assumed panel efficiency (20%)
+# Load environment variables from .env file
+load_dotenv()
+
+# Configuration from environment variables
+API_TOKEN = os.getenv("TEMPEST_API_TOKEN")
+STATION_ID = os.getenv("TEMPEST_STATION_ID")
+CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "4")
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+PANEL_SIZE = float(os.getenv("PANEL_SIZE", "0.04"))
+PANEL_EFFICIENCY = float(os.getenv("PANEL_EFFICIENCY", "0.20"))
+
+# Validate required configuration
+if not API_TOKEN or not STATION_ID:
+    raise ValueError("TEMPEST_API_TOKEN and TEMPEST_STATION_ID must be set in .env file")
 
 # API endpoint for current observations
 url = f"https://swd.weatherflow.com/swd/rest/observations/station/{STATION_ID}?token={API_TOKEN}"

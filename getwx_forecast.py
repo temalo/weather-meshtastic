@@ -2,15 +2,19 @@ import requests
 import meshtastic
 import meshtastic.tcp_interface
 import time
+import os
 from datetime import datetime, timezone
+from dotenv import load_dotenv
 
-# Home Location
-LAT = 33.74733
-LON = -111.77912
-CHANNEL_INDEX = "4"
-MESHTASTIC_HOST = "localhost"  # Change to your Meshtastic device IP
+# Load environment variables from .env file
+load_dotenv()
 
-USER_AGENT = "WeatherApp/1.0 (your.email@example.com)"  # use your email/domain
+# Configuration from environment variables
+LAT = float(os.getenv("LAT", "33.74733"))
+LON = float(os.getenv("LON", "-111.77912"))
+CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "4")
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+USER_AGENT = os.getenv("USER_AGENT", "WeatherApp/1.0 (your.email@example.com)")
 
 def get_json(url):
     resp = requests.get(url, headers={"User-Agent": USER_AGENT, "Accept": "application/ld+json"})

@@ -2,18 +2,19 @@ import requests
 import meshtastic
 import meshtastic.tcp_interface
 import time
+import os
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Location coordinates (NE Scottsdale area)
-LAT = 33.74733
-LON = -111.77912
+# Load environment variables from .env file
+load_dotenv()
 
-# User-Agent header required by NWS API
-USER_AGENT = "WeatherApp/1.0 (your.email@example.com)"
-
-# Meshtastic configuration
-MESHTASTIC_HOST = "localhost"  # Change to your Meshtastic device IP
-CHANNEL_INDEX = "4"
+# Configuration from environment variables
+LAT = float(os.getenv("LAT", "33.74733"))
+LON = float(os.getenv("LON", "-111.77912"))
+USER_AGENT = os.getenv("USER_AGENT", "WeatherApp/1.0 (your.email@example.com)")
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "4")
 
 def get_json(url):
     """Make a request to NWS API with required headers"""
