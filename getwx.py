@@ -59,9 +59,9 @@ if response.status_code == 200:
 
     # Construct formatted message
     message = (
-        f"WX NE Scottsdale as of {local}: Temp:{temp_f:.0f}°F, Feels Like: {feel_f:.0f}°F, Humidity:{humidity}%, Barometer:{pressure_inHg:.2f} Hg, and {trend}, "
-        f"Wind:{wind_speed_mph:.0f} mph at {wind_direction}°, Rain:{rainfall_in:.2f} in, "
-        f"Lightning Strikes:{lightning_strikes}, Solar Index:{solar_radiation} W/m², Est panel power:{panel_power:.2f} W"
+        f"WX NE Scottsdale as of {local}: Temp:{temp_f:.0f}°F | Feels Like: {feel_f:.0f}°F |Humidity:{humidity}% | Barometer:{pressure_inHg:.2f} Hg and {trend} | "
+        f"Wind:{wind_speed_mph:.0f} mph at {wind_direction}° | Rain:{rainfall_in:.2f} in | "
+        f"Lightning Strikes:{lightning_strikes} | Solar Index:{solar_radiation} W/m² | Est panel power:{panel_power:.2f} W"
     )
 
     # Enforce 210 character limit for Meshtastic - split into multiple messages if needed
