@@ -17,7 +17,7 @@ CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "0")
 
 # Validate required configuration
 if not TEMPEST_STATION_ID or not TEMPEST_API_TOKEN:
-    raise ValueError("TEMPEST_STATION_ID and TEMPEST_API_TOKEN must be set in .env file")
+    raise ValueError("TEMPEST_STATION_ID and TEMPEST_API_TOKEN environment variables must be set")
 
 def main():
     try:

@@ -19,7 +19,7 @@ PANEL_EFFICIENCY = float(os.getenv("PANEL_EFFICIENCY", "0.20"))
 
 # Validate required configuration
 if not API_TOKEN or not STATION_ID:
-    raise ValueError("TEMPEST_API_TOKEN and TEMPEST_STATION_ID must be set in .env file")
+    raise ValueError("TEMPEST_API_TOKEN and TEMPEST_STATION_ID environment variables must be set")
 
 # API endpoint for current observations
 url = f"https://swd.weatherflow.com/swd/rest/observations/station/{STATION_ID}?token={API_TOKEN}"
