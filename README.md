@@ -79,7 +79,9 @@ This project uses environment variables for configuration. All settings are mana
 Edit your `.env` file with the following variables:
 
 #### Required for All Scripts
-- `MESHTASTIC_HOST` - IP address or hostname of your Meshtastic device (default: `localhost`)
+- `MESHTASTIC_INTERFACE` - Connection type: `tcp` or `serial` (default: `tcp`)
+- `MESHTASTIC_HOST` - IP address or hostname of your Meshtastic device (required for TCP, default: `localhost`)
+- `MESHTASTIC_PORT` - Serial port for your Meshtastic device (required for Serial, e.g., `COM3` on Windows or `/dev/ttyUSB0` on Linux)
 - `CHANNEL_INDEX` - Meshtastic channel index to send messages to (default: `4` for most scripts, `0` for `tempest_forecast.py`)
 
 #### Required for NWS Scripts (getwx_forecast.py, nws_current_weather.py)
@@ -97,9 +99,34 @@ Edit your `.env` file with the following variables:
 
 ### Example .env File
 
+**TCP Interface (default):**
 ```bash
-# Meshtastic Configuration
+# Meshtastic Configuration - TCP Interface
+MESHTASTIC_INTERFACE=tcp
 MESHTASTIC_HOST=192.168.1.100
+CHANNEL_INDEX=4
+
+# Location Coordinates (for NWS scripts)
+LAT=33.74733
+LON=-111.77912
+
+# NWS API Configuration
+USER_AGENT=WeatherApp/1.0 (your.email@example.com)
+
+# Tempest Weather Station Configuration
+TEMPEST_STATION_ID=12345
+TEMPEST_API_TOKEN=your-api-token-here
+
+# Solar Panel Configuration (for getwx.py)
+PANEL_SIZE=0.04
+PANEL_EFFICIENCY=0.20
+```
+
+**Serial Interface:**
+```bash
+# Meshtastic Configuration - Serial Interface
+MESHTASTIC_INTERFACE=serial
+MESHTASTIC_PORT=COM3  # Windows example (use /dev/ttyUSB0 on Linux)
 CHANNEL_INDEX=4
 
 # Location Coordinates (for NWS scripts)
@@ -194,7 +221,38 @@ The `nws_current_weather.py` script automatically uses the station name from the
 
 ## Meshtastic Setup
 
-These scripts use the Meshtastic TCP interface. Make sure your Meshtastic device is accessible via TCP on the configured host.
+These scripts support both TCP and Serial interfaces for connecting to your Meshtastic device.
+
+### TCP Interface (Network Connection)
+
+Connect to a Meshtastic device over the network (WiFi or Ethernet):
+- Set `MESHTASTIC_INTERFACE=tcp` in your `.env` file
+- Set `MESHTASTIC_HOST` to the IP address or hostname of your device
+- Make sure your Meshtastic device has network connectivity enabled
+
+### Serial Interface (USB Connection)
+
+Connect to a Meshtastic device via USB serial port:
+- Set `MESHTASTIC_INTERFACE=serial` in your `.env` file
+- Set `MESHTASTIC_PORT` to your serial port:
+  - **Windows**: `COM3`, `COM4`, etc. (check Device Manager)
+  - **Linux**: `/dev/ttyUSB0`, `/dev/ttyACM0`, etc.
+  - **macOS**: `/dev/tty.usbserial-*` or `/dev/tty.SLAB_USBtoUART`
+- Make sure your Meshtastic device is connected via USB
+
+### Finding Your Serial Port
+
+**Windows:**
+```powershell
+Get-PnpDevice -Class Ports -Status OK | Select-Object Name, FriendlyName
+```
+
+**Linux/macOS:**
+```bash
+ls /dev/tty*
+# or
+dmesg | grep tty
+```
 
 ## License
 

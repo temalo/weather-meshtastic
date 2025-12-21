@@ -1,6 +1,7 @@
 import requests
 import meshtastic
 import meshtastic.tcp_interface
+import meshtastic.serial_interface
 import time
 import os
 from datetime import datetime
@@ -12,7 +13,9 @@ load_dotenv()
 # Configuration from environment variables
 TEMPEST_STATION_ID = os.getenv("TEMPEST_STATION_ID")
 TEMPEST_API_TOKEN = os.getenv("TEMPEST_API_TOKEN")
-MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+MESHTASTIC_INTERFACE = os.getenv("MESHTASTIC_INTERFACE", "tcp")  # 'tcp' or 'serial'
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")  # For TCP
+MESHTASTIC_PORT = os.getenv("MESHTASTIC_PORT")  # For Serial (e.g., COM3, /dev/ttyUSB0)
 CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "0")
 
 # Validate required configuration
@@ -142,7 +145,15 @@ def main():
         
         # Send message(s) using Meshtastic API
         try:
-            interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
+            # Create interface based on configuration
+            if MESHTASTIC_INTERFACE.lower() == "serial":
+                if not MESHTASTIC_PORT:
+                    raise ValueError("MESHTASTIC_PORT must be set when using serial interface")
+                interface = meshtastic.serial_interface.SerialInterface(MESHTASTIC_PORT)
+                print(f"\nConnected via Serial: {MESHTASTIC_PORT}")
+            else:
+                interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
+                print(f"\nConnected via TCP: {MESHTASTIC_HOST}")
             
             for idx, msg in enumerate(messages_to_send, 1):
                 print(f"\nSending forecast message part {idx}/{len(messages_to_send)} ({len(msg)} chars)...")

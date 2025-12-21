@@ -1,6 +1,7 @@
 import requests
 import meshtastic
 import meshtastic.tcp_interface
+import meshtastic.serial_interface
 import time
 import os
 from datetime import datetime, timezone
@@ -13,7 +14,9 @@ load_dotenv()
 LAT = float(os.getenv("LAT", "33.74733"))
 LON = float(os.getenv("LON", "-111.77912"))
 CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "4")
-MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+MESHTASTIC_INTERFACE = os.getenv("MESHTASTIC_INTERFACE", "tcp")  # 'tcp' or 'serial'
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")  # For TCP
+MESHTASTIC_PORT = os.getenv("MESHTASTIC_PORT")  # For Serial (e.g., COM3, /dev/ttyUSB0)
 USER_AGENT = os.getenv("USER_AGENT", "WeatherApp/1.0 (your.email@example.com)")
 
 def get_json(url):
@@ -118,7 +121,15 @@ def main():
     
     # Send message(s) using Meshtastic API
     try:
-        interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
+        # Create interface based on configuration
+        if MESHTASTIC_INTERFACE.lower() == "serial":
+            if not MESHTASTIC_PORT:
+                raise ValueError("MESHTASTIC_PORT must be set when using serial interface")
+            interface = meshtastic.serial_interface.SerialInterface(MESHTASTIC_PORT)
+            print(f"Connected via Serial: {MESHTASTIC_PORT}")
+        else:
+            interface = meshtastic.tcp_interface.TCPInterface(hostname=MESHTASTIC_HOST)
+            print(f"Connected via TCP: {MESHTASTIC_HOST}")
         
         # Send forecast message(s)
         for idx, msg in enumerate(forecast_messages, 1):
