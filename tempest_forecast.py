@@ -2,15 +2,22 @@ import requests
 import meshtastic
 import meshtastic.tcp_interface
 import time
+import os
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Tempest Weather Station configuration
-TEMPEST_STATION_ID = "YOUR_STATION_ID"
-TEMPEST_API_TOKEN = "YOUR_API_TOKEN"
+# Load environment variables from .env file
+load_dotenv()
 
-# Meshtastic configuration
-MESHTASTIC_HOST = "localhost"  # Change to your Meshtastic device IP
-CHANNEL_INDEX = "0"
+# Configuration from environment variables
+TEMPEST_STATION_ID = os.getenv("TEMPEST_STATION_ID")
+TEMPEST_API_TOKEN = os.getenv("TEMPEST_API_TOKEN")
+MESHTASTIC_HOST = os.getenv("MESHTASTIC_HOST", "localhost")
+CHANNEL_INDEX = os.getenv("CHANNEL_INDEX", "0")
+
+# Validate required configuration
+if not TEMPEST_STATION_ID or not TEMPEST_API_TOKEN:
+    raise ValueError("TEMPEST_STATION_ID and TEMPEST_API_TOKEN environment variables must be set")
 
 def main():
     try:
